@@ -33,7 +33,6 @@ public class CustomersController {
     public ResponseEntity<Customers> getCustomerById(@PathVariable int id) {
         Optional<Customers> client = customerRepository.findById(id);
         if (client.isPresent()) {
-            System.out.println(client.get());
             return ResponseEntity.ok(client.get());
         } else {
             return ResponseEntity.notFound().build();

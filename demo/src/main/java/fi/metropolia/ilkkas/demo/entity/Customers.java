@@ -38,6 +38,7 @@ public class Customers {
     private List<Orders> orders = new ArrayList<>();
 
     public Customers() {
+        // Default constructor
     }
 
     public int getId() { return id; }

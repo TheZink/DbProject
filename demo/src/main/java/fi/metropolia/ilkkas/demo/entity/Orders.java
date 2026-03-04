@@ -33,6 +33,7 @@ public class Orders {
     private Customers customer;
 
     public Orders() {
+        // Default constructor
     }
 
     public int getId() { return id; }
