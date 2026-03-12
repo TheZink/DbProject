@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fi.metropolia.ilkkas.demo.entity.Customers;
 import fi.metropolia.ilkkas.demo.repository.CustomerRepository;
+import fi.metropolia.ilkkas.demo.dto.CustomerDto;
+import fi.metropolia.ilkkas.demo.service.CustomerService;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -24,9 +27,11 @@ import java.util.Optional;
 public class CustomersController {
 
     private final CustomerRepository customerRepository;
+    private final CustomerService customerService;
 
-    public CustomersController(CustomerRepository customerRepository) {
+    public CustomersController(CustomerRepository customerRepository, CustomerService customerService) {
         this.customerRepository = customerRepository;
+        this.customerService = customerService;
     }
     
     @GetMapping("/get/{id}")
@@ -40,12 +45,15 @@ public class CustomersController {
     }
 
     @PutMapping("/put/{id}")
-    public ResponseEntity<String> putCustomer(@PathVariable int id, @RequestBody Customers customer) {
-        if (customerRepository.existsById(id)) {
-            customerRepository.save(customer);
-            return ResponseEntity.ok("Asiakas päivitetty onnistuneesti.");
-        } else {
+    public ResponseEntity<String> putCustomer(@PathVariable int id, @RequestBody CustomerDto customerDto) {
+        if (!customerRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
+        }
+        Customers updated = customerService.saveOrUpdateWithAddress(id, customerDto);
+        if (updated != null) {
+            return ResponseEntity.ok("Asiakas ja osoite päivitetty onnistuneesti.");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Päivitys epäonnistui.");
         }
     }
     
@@ -60,13 +68,14 @@ public class CustomersController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteCustomer(@PathVariable(required = false) int id, @RequestParam(required = false) Integer idParam) {
+    @Transactional
+    public ResponseEntity<String> deleteCustomer(@PathVariable int id, @RequestParam(required = false) Integer idParam) {
 
         int customerId = (idParam != null) ? idParam : id;
 
         if (customerRepository.existsById(customerId)) {
             customerRepository.deleteById(customerId);
-            return ResponseEntity.ok("Asiakas poistettu onnistuneesti.");
+            return ResponseEntity.ok("Asiakas poisto onnistui.");
         } else {
             return ResponseEntity.notFound().build();
         }

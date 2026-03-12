@@ -14,6 +14,7 @@ import fi.metropolia.ilkkas.demo.entity.Orders;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.util.Optional;
 
 
 @RestController
@@ -26,12 +27,17 @@ public class OrdersController {
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<?> getOrderById(int id) {
-        return ordersRepository.findById(id).map(order -> ResponseEntity.ok(order)).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Orders> getOrderById(@PathVariable int id) {
+        Optional<Orders> order = ordersRepository.findById(id);
+        if (order.isPresent()) {
+            return ResponseEntity.ok(order.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/put/{id}")
-    public ResponseEntity<?> putOrderById(@PathVariable(required = false) int id, @RequestParam(required = false) Integer idParam) {
+    public ResponseEntity<String> putOrderById(@PathVariable int id, @RequestParam(required = false) Integer idParam) {
         
         int orderId = (idParam != null) ? idParam : id;
         
@@ -43,13 +49,13 @@ public class OrdersController {
     }
 
     @PostMapping("/post")
-    public ResponseEntity<?> postOrder(@RequestBody Orders order) {
+    public ResponseEntity<String> postOrder(@RequestBody Orders order) {
         ordersRepository.save(order);
         return ResponseEntity.ok("Tilauksen tallentaminen onnistui.");
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteOrderById(@PathVariable(required = false) int id, @RequestParam(required = false) Integer idParam) {
+    public ResponseEntity<String> deleteOrderById(@PathVariable int id, @RequestParam(required = false) Integer idParam) {
         
         int orderId = (idParam != null) ? idParam : id;
         

@@ -12,8 +12,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.CascadeType;
+import java.util.List;
+import java.util.ArrayList;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "orders")
 public class Orders {
@@ -22,8 +29,10 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column (name = "id")
     private int id;
+
     @Column (name = "order_date")
     private LocalDateTime orderDate;
+    
     @Column (name = "delivery_date")
     private LocalDateTime deliveryDate;
 
@@ -31,6 +40,19 @@ public class Orders {
     @JsonBackReference
     @JoinColumn(name = "customer_id")
     private Customers customer;
+
+    @ManyToOne(fetch = FetchType.LAZY,
+                cascade = CascadeType.ALL)
+    @JsonBackReference
+    @JoinColumn(name = "shipping_address_id")
+    private CustomerAddresses shippingAddress;
+
+    @OneToMany(mappedBy = "order",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JsonBackReference
+    private List<OrderItems> orderItems = new ArrayList<>();
 
     public Orders() {
         // Default constructor
@@ -53,4 +75,10 @@ public class Orders {
     
     public void setCustomer(Customers customer) { this.customer = customer; }
 
+    public List<OrderItems> getOrderItems() { return orderItems; }
+    public void setOrderItems(List<OrderItems> orderItems) { this.orderItems = orderItems; }
+
+    public CustomerAddresses getShippingAddress() { return shippingAddress; }
+    public void setShippingAddress(CustomerAddresses shippingAddress) { this.shippingAddress = shippingAddress;
+    }
 }

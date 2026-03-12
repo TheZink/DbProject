@@ -11,8 +11,11 @@ import jakarta.persistence.Table;
 import jakarta.persistence.GenerationType;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.ArrayList;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "customers")
 public class Customers {
@@ -32,38 +35,40 @@ public class Customers {
 
     @OneToMany(mappedBy = "customer",
             fetch = FetchType.LAZY, 
-            cascade = CascadeType.REMOVE, 
+            cascade = CascadeType.ALL, 
             orphanRemoval = true)
-
     private List<Orders> orders = new ArrayList<>();
+
+    @OneToMany(mappedBy = "customer",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<CustomerAddresses> addresses = new ArrayList<>();
 
     public Customers() {
         // Default constructor
     }
 
     public int getId() { return id; }
-    
     public void setId(int id) { this.id = id; }
 
     public String getFirstName() { return firstName; }
-
     public void setFirstName(String firstName) { 
         this.firstName = firstName;
     }
 
     public String getLastName() { return lastName; }
-
     public void setLastName(String lastName) { this.lastName = lastName; }
 
     public String getEmail() { return email; }
-
     public void setEmail(String email) { this.email = email; }
 
     public String getPhone() { return phone; }
-
     public void setPhone(String phone) { this.phone = phone; }
 
     public List<Orders> getOrders() { return orders; }
-
     public void setOrders(List<Orders> orders) { this.orders = orders; }
+
+    public List<CustomerAddresses> getAddresses() { return addresses; }
+    public void setAddresses(List<CustomerAddresses> addresses) { this.addresses = addresses; }
 }
