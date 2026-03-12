@@ -1,11 +1,12 @@
 package fi.metropolia.ilkkas.demo.repository;
 
-import fi.metropolia.ilkkas.demo.entity.Products;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
-public interface ProductRepository extends JpaRepository<Products, Integer>, ProductRepositoryCustom {
+import fi.metropolia.ilkkas.demo.entity.Products;
+
+public interface ProductRepository extends JpaRepository<Products, Integer> {
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Products p SET p.price = p.price * :percentage")
