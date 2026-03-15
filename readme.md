@@ -31,5 +31,3 @@
 - **IDs:** Most endpoints use integer IDs. `percentage` is a double for bulk price changes.
 - **Transactionality:** `DELETE /customers/delete/{id}` is annotated `@Transactional`.
 - **DTOs / Entities:** Request bodies use project entity classes (`Customers`, `Orders`, `Products`, `Supplier`) or `CustomerDto` for customer update. See source in `demo/src/main/java/fi/metropolia/ilkkas/demo/controller/` for implementation details.
-
-If you want, I can also add example curl commands for each endpoint or generate a Postman collection.
